@@ -1,84 +1,188 @@
-**Week 1: MongoDB Fundamentals Assignment**
+# MongoDB Fundamentals Assignment
 
-**Objective:**
+## **Objective**
 
-- Apply MongoDB concepts learned throughout the week.
-- Practice working with databases, collections, and documents.
-- Develop skills in CRUD operations and data modeling.
+This assignment demonstrates my understanding of MongoDB by applying key concepts such as CRUD operations, data modeling, aggregation, and indexing.
 
-**Instructions:**
+---
 
-1. **Setup MongoDB:**
+## **Setup MongoDB**
 
-   - Install MongoDB locally or create a free cluster on MongoDB Atlas.
-   - Start the MongoDB server locally or connect to the MongoDB Atlas cluster.
-   - Verify the installation and connection by running:
-     ```sh
-     mongo --version
-     ```
+### **Installation**
 
-2. **Database and Collection Creation:**
+- Install MongoDB locally from [MongoDB Official Website](https://www.mongodb.com/try/download/community) OR
+- Create a free cluster on [MongoDB Atlas](https://www.mongodb.com/atlas/database)
 
-   - Create a new database called `library`.
-   - Inside `library`, create a collection named `books`.
+### **Starting the Server**
 
-3. **Insert Data:**
+- If installed locally, start MongoDB:
+  ```sh
+  mongod
+  ```
+- Verify installation:
+  ```sh
+  mongo --version
+  ```
 
-   - Insert at least five book records into the `books` collection.
-   - Each book should contain fields such as `title`, `author`, `publishedYear`, `genre`, and `ISBN`.
+---
 
-4. **Retrieve Data:**
+## **Database and Collection Creation**
 
-   - Retrieve all books from the collection.
-   - Query books based on a specific author.
-   - Find books published after the year 2000.
+### **Create a new database and collection**
 
-5. **Update Data:**
+```javascript
+use library;
+db.createCollection("books");
+```
 
-   - Update the `publishedYear` of a specific book.
-   - Add a new field called `rating` to all books and set a default value.
+---
 
-6. **Delete Data:**
+## **Inserting Data**
 
-   - Delete a book by its `ISBN`.
-   - Remove all books of a particular genre.
+### **Insert multiple book records**
 
-7. **Data Modeling Exercise:**
+```javascript
+db.books.insertMany([
+  { title: "The Pragmatic Programmer", author: "Andrew Hunt", publishedYear: 1999, genre: "Technology", ISBN: "978-0201616224" },
+  { title: "Clean Code", author: "Robert C. Martin", publishedYear: 2008, genre: "Technology", ISBN: "978-0132350884" },
+  { title: "The Great Gatsby", author: "F. Scott Fitzgerald", publishedYear: 1925, genre: "Fiction", ISBN: "978-0743273565" },
+  { title: "Atomic Habits", author: "James Clear", publishedYear: 2018, genre: "Self-Help", ISBN: "978-0735211292" },
+  { title: "1984", author: "George Orwell", publishedYear: 1949, genre: "Dystopian", ISBN: "978-0451524935" }
+]);
+```
 
-   - Create a data model for an e-commerce platform including collections for `users`, `orders`, and `products`.
-   - Decide on appropriate fields and relationships (embedding vs. referencing).
-   - Implement the structure using MongoDB.
+---
 
-8. **Aggregation Pipeline:**
+## **Retrieving Data**
 
-   - Use aggregation to find the total number of books per genre.
-   - Calculate the average published year of all books.
-   - Identify the top-rated book.
+- **Retrieve all books:**
+  ```javascript
+  db.books.find().pretty();
+  ```
+- **Query books by a specific author:**
+  ```javascript
+  db.books.find({ author: "Robert C. Martin" });
+  ```
+- **Find books published after 2000:**
+  ```javascript
+  db.books.find({ publishedYear: { $gt: 2000 } });
+  ```
 
-9. **Indexing:**
+---
 
-   - Create an index on the `author` field to optimize query performance.
-   - Explain the benefits of indexing in MongoDB.
+## **Updating Data**
 
-10. **Testing:**
+- **Update ****`publishedYear`**** for a specific book:**
+  ```javascript
+  db.books.updateOne({ title: "1984" }, { $set: { publishedYear: 1950 } });
+  ```
+- **Add a new field ****`rating`**** to all books:**
+  ```javascript
+  db.books.updateMany({}, { $set: { rating: 5 } });
+  ```
 
-   - Use the MongoDB shell or Compass to verify the inserted and updated records.
-   - Ensure all queries return the expected results.
+---
 
-11. **Documentation:**
+## **Deleting Data**
 
-   - Create a `README.md` file with step-by-step instructions on setting up and running your database.
+- **Delete a book by ISBN:**
+  ```javascript
+  db.books.deleteOne({ ISBN: "978-0451524935" });
+  ```
+- **Remove all books of a particular genre:**
+  ```javascript
+  db.books.deleteMany({ genre: "Dystopian" });
+  ```
 
-12. **Submission:**
+---
 
-   - Push your code and scripts to your GitHub repository.
+## **Data Modeling for E-Commerce**
 
-**Evaluation Criteria:**
+### **Collections & Structure**
 
-- Proper setup and connection of MongoDB.
-- Accurate implementation of CRUD operations.
-- Correct data modeling with appropriate relationships.
-- Use of aggregation for insightful queries.
-- Clear and concise documentation.
-- Proper indexing implementation.
+#### **Users Collection**
 
+```javascript
+{
+  _id: ObjectId(),
+  name: "John Doe",
+  email: "john@example.com",
+  password: "hashed_password",
+  address: "123 Main St, City",
+  orders: [ObjectId("order_id")]
+}
+```
+
+#### **Products Collection**
+
+```javascript
+{
+  _id: ObjectId(),
+  name: "Laptop",
+  description: "High-performance laptop",
+  price: 1200.99,
+  category: "Electronics",
+  stock: 50
+}
+```
+
+#### **Orders Collection**
+
+```javascript
+{
+  _id: ObjectId(),
+  userId: ObjectId("user_id"),
+  products: [ { productId: ObjectId("product_id"), quantity: 1 } ],
+  total: 1200.99,
+  status: "Shipped"
+}
+```
+
+---
+
+## **Aggregation Pipeline**
+
+- **Find the total number of books per genre:**
+  ```javascript
+  db.books.aggregate([
+    { $group: { _id: "$genre", totalBooks: { $sum: 1 } } }
+  ]);
+  ```
+- **Calculate the average published year:**
+  ```javascript
+  db.books.aggregate([
+    { $group: { _id: null, avgPublishedYear: { $avg: "$publishedYear" } } }
+  ]);
+  ```
+- **Find the top-rated book:**
+  ```javascript
+  db.books.find().sort({ rating: -1 }).limit(1);
+  ```
+
+---
+
+## **Indexing**
+
+- **Create an index on the ****`author`**** field:**
+  ```javascript
+  db.books.createIndex({ author: 1 });
+  ```
+
+### **Benefits of Indexing:**
+
+- **Speeds up queries** by reducing scan time.
+- **Optimizes sorting and search performance.**
+- **Reduces resource consumption** during data retrieval.
+
+---
+
+## **Testing & Verification**
+
+- Use **MongoDB Compass** or **MongoDB Shell** (`mongosh`) to verify data.
+- Ensure queries return expected results.
+- Check indexing with:
+  ```javascript
+  db.books.getIndexes();
+  ```
+
+---

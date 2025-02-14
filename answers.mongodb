@@ -1,0 +1,134 @@
+// insert data
+db.books.insertMany([
+  {
+    title: "The Pragmatic Programmer",
+    author: "Andrew Hunt",
+    publishedYear: 1999,
+    genre: "Technology",
+    ISBN: "978-0201616224"
+  },
+  {
+    title: "Clean Code",
+    author: "Robert C. Martin",
+    publishedYear: 2008,
+    genre: "Technology",
+    ISBN: "978-0132350884"
+  },
+  {
+    title: "The Great Gatsby",
+    author: "F. Scott Fitzgerald",
+    publishedYear: 1925,
+    genre: "Fiction",
+    ISBN: "978-0743273565"
+  },
+  {
+    title: "Atomic Habits",
+    author: "James Clear",
+    publishedYear: 2018,
+    genre: "Self-Help",
+    ISBN: "978-0735211292"
+  },
+  {
+    title: "1984",
+    author: "George Orwell",
+    publishedYear: 1949,
+    genre: "Dystopian",
+    ISBN: "978-0451524935"
+  }
+]);
+
+// Retrieve data
+db.books.find().pretty();
+
+
+db.books.find({ author: "Robert C. Martin" });
+
+
+db.books.find({ publishedYear: { $gt: 2000 } });
+
+
+// Update data
+db.books.updateOne(
+  { title: "1984" },
+  { $set: { publishedYear: 1950 } }
+);
+
+
+db.books.updateMany({}, { $set: { rating: 5 } });
+
+
+// Delete data
+db.books.deleteOne({ ISBN: "978-0451524935" });
+
+db.books.deleteMany({ genre: "Dystopian" });
+
+
+// Data Modelling
+
+db.users.insertOne({
+    id: 1,
+  name: "John Doe",
+  email: "john@example.com",
+  password: "hashed_password",
+  address: "123 Main St, Nairobi",
+  orders: []
+});
+
+
+db.products.insertMany([
+  {
+    id: 2,
+    name: "Laptop",
+    description: "High-performance laptop",
+    price: 1200.99,
+    category: "Electronics",
+    stock: 50
+  },
+  {
+    name: "Smartphone",
+    description: "Latest 5G smartphone",
+    price: 899.99,
+    category: "Electronics",
+    stock: 100
+  }
+]);
+
+
+db.orders.insertOne({
+  userId: ObjectId("1"),  
+  products: [
+    { productId: ObjectId("2"), quantity: 1, price: 1200.99 }
+  ],
+  total: 1200.99,
+  status: "Processing"
+});
+
+
+db.users.find().pretty();
+db.products.find().pretty();
+
+
+db.products.find({ category: "Electronics" }).pretty();
+
+db.users.createIndex({ email: 1 });
+
+db.products.createIndex({ category: 1 });
+
+
+// Aggregation pipeline
+db.books.aggregate([
+  { $group: { _id: "$genre", totalBooks: { $sum: 1 } } }
+]);
+
+
+db.books.aggregate([
+  { $group: { _id: null, avgPublishedYear: { $avg: "$publishedYear" } } }
+]);
+
+
+db.books.find().sort({ rating: -1 }).limit(1);
+
+
+db.books.createIndex({ author: 1 });
+
+db.books.getIndexes();
